@@ -1,3 +1,5 @@
+import Data.List (intersperse)
+
 factorial :: (Ord a, Num a, Show a) => a -> a
 factorial x
     | x < 0 = error $ "Factorial called with negative number: " ++ (show x)
@@ -52,3 +54,25 @@ mc91 :: Integral a => a -> a
 mc91 n
     | n > 100 = n - 10
     | otherwise = mc91 . mc91 $ n + 11
+
+digitToWord :: Int -> String
+digitToWord 0 = "zero"
+digitToWord 1 = "one"
+digitToWord 2 = "two"
+digitToWord 3 = "three"
+digitToWord 4 = "four"
+digitToWord 5 = "five"
+digitToWord 6 = "six"
+digitToWord 7 = "seven"
+digitToWord 8 = "eight"
+digitToWord 9 = "nine"
+digitToWord _ = error "digitToWord only accepts 0-9!"
+
+digits :: Int -> [Int]
+digits n
+    | tens == 0 = [ones]
+    | otherwise = digits tens ++ [ones]
+        where (tens, ones) = divMod n 10
+
+wordNumber :: Int -> String
+wordNumber n = concat . intersperse "-" . map digitToWord $ digits n
