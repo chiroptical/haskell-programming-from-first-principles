@@ -1,1 +1,1 @@
-On Section 11.12, Algebraic Datatypes - Normal Form
+On Section 11, Chapter Exercises "Hutton's Razor"
