@@ -1,1 +1,1 @@
-On Section 11, Chapter Exercises "Hutton's Razor"
+On Section 12.5, "String processing": 1. `replaceThe` problem
