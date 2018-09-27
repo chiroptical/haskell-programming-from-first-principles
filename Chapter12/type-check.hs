@@ -63,3 +63,54 @@ replaceThe' xs@(_:_:[]) = xs
 replaceThe' xs@(a:b:c:ds)
     | notThe (a:b:c:[]) == Nothing = 'a' : replaceThe' ds
     | otherwise = a : replaceThe' (tail xs)
+
+replaceThe'' :: String -> String
+replaceThe'' = intercalate " " . go . map notThe . words
+    where go [] = []
+          go (Just x : []) = x : []
+          go (_ : []) = "a" : []
+          go (Just x : Just y : ys) = x : y : go ys
+          go (_ : Just x : ys) = "a" : x : go ys
+          go (Just x : _ : ys) = x : "a" : go ys
+          go (_ : _ : ys) = "a" : "a" : go ys
+
+countTheBeforeVowel :: String -> Integer
+countTheBeforeVowel = go . map notThe . words
+    where go [] = 0
+          go (_: []) = 0
+          go (Nothing : Just x: ys)
+            | head x `elem` "aeiouy" = 1 + go ys
+            | otherwise = 0 + go ys
+          go (_ : x : xs) = go (x:xs)
+
+data Vowel = A | E | I | O | U | Y deriving (Show, Eq)
+
+mkVowel :: Char -> Maybe Vowel
+mkVowel 'a' = Just A
+mkVowel 'e' = Just E
+mkVowel 'i' = Just I
+mkVowel 'o' = Just O
+mkVowel 'u' = Just U
+mkVowel 'y' = Just Y
+mkVowel _ = Nothing
+
+countVowels :: String -> Integer
+countVowels = go . map mkVowel
+    where go [] = 0
+          go (Just x : []) = 1
+          go (Just x : xs) = 1 + go xs
+          go (_:xs) = go xs
+
+newtype Word' = Word' String deriving (Eq, Show)
+
+-- go adds 1 for vowels and subtracts 1 for consonants
+-- -> positive values are considered invalid
+mkWord :: String -> Maybe Word'
+mkWord s = valid . go . map mkVowel $ s
+    where go [] = 0
+          go (Just x : []) = 1
+          go (Just x : xs) = (go xs) + 1
+          go (_ : xs) = (go xs) - 1
+          valid a
+            | a > 0 || s == [] = Nothing
+            | otherwise = Just (Word' s)
