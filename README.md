@@ -1,1 +1,1 @@
-On Section 12.5, "It's only Natural", page 482
+On Section 12.5, "Write your own iterate and unfoldr", "2.", pg. 488

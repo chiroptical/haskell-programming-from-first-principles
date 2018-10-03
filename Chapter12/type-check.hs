@@ -114,3 +114,18 @@ mkWord s = valid . go . map mkVowel $ s
           valid a
             | a > 0 || s == [] = Nothing
             | otherwise = Just (Word' s)
+
+data Nat = Zero | Succ Nat deriving (Eq, Show)
+
+natToInteger :: Nat -> Integer
+natToInteger Zero = 0
+natToInteger (Succ Zero) = 1
+natToInteger (Succ a) = 1 + natToInteger a
+
+integerToNat :: Integer -> Maybe Nat
+integerToNat a
+    | a < 0 = Nothing
+    | otherwise = Just $ go a
+    where go a
+            | a == 0 = Zero
+            | otherwise = Succ (go $ a - 1)
