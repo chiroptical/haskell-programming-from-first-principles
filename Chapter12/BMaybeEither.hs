@@ -25,8 +25,16 @@ catMaybes = concat . map maybeToList
 flipMaybe :: [Maybe a] -> Maybe [a]
 flipMaybe [] = Nothing
 flipMaybe (Nothing:xs) = Nothing
-flipMaybe ((Just x):xs) = foldl f (Just [x]) xs
+flipMaybe xs = foldl f (Just []) xs
     where f (Just y) (Just x) = Just $ y ++ [x]
+          f _ Nothing = Nothing
+          f _ _ = Nothing
+
+flipMaybe' :: [Maybe a] -> Maybe [a]
+flipMaybe' [] = Nothing
+flipMaybe' (Nothing:xs) = Nothing
+flipMaybe' xs = foldr f (Just []) xs
+    where f (Just x) (Just y) = Just $ (flip (:)) y x
           f _ Nothing = Nothing
           f _ _ = Nothing
 
