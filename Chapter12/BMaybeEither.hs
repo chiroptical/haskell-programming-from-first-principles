@@ -20,7 +20,8 @@ maybeToList :: Maybe a -> [a]
 maybeToList = mayybee [] (:[])
 
 catMaybes :: [Maybe a] -> [a]
-catMaybes = concat . map maybeToList
+-- catMaybes = concat . map maybeToList
+catMaybes = concatMap maybeToList
 
 flipMaybe :: [Maybe a] -> Maybe [a]
 flipMaybe [] = Nothing
@@ -65,4 +66,5 @@ either' f f' (Left x) = f x
 either' f f' (Right x) = f' x
 
 eitherMaybe'' :: (b -> c) -> Either a b -> Maybe c
-eitherMaybe'' f e = either' (\_ -> Nothing) (\x -> Just $ f x) e
+-- eitherMaybe'' f e = either' (\_ -> Nothing) (\x -> Just $ f x) e
+eitherMaybe'' f = either' (const Nothing) (Just f)

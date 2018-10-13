@@ -51,24 +51,24 @@ notThe w
     | otherwise = Nothing
 
 replaceThe :: String -> String
-replaceThe = intercalate " " . map f . words
+replaceThe = unwords . map f . words
     where f a
-            | notThe a == Nothing = "a"
+            | isNothing $ notThe a = "a"
             | otherwise = a
 
 replaceThe' :: String -> String
 replaceThe' [] = []
-replaceThe' xs@(_:[]) = xs
-replaceThe' xs@(_:_:[]) = xs
+replaceThe' xs@[_] = xs
+replaceThe' xs@[_, _] = xs
 replaceThe' xs@(a:b:c:ds)
-    | notThe (a:b:c:[]) == Nothing = 'a' : replaceThe' ds
+    | isNothing $ notThe [a, b, c] = 'a' : replaceThe' ds
     | otherwise = a : replaceThe' (tail xs)
 
 replaceThe'' :: String -> String
-replaceThe'' = intercalate " " . go . map notThe . words
+replaceThe'' = unwords . go . map notThe . words
     where go [] = []
-          go (Just x : []) = x : []
-          go (_ : []) = "a" : []
+          go [Just x] = [x]
+          go [_] = ["a"]
           go (Just x : Just y : ys) = x : y : go ys
           go (_ : Just x : ys) = "a" : x : go ys
           go (Just x : _ : ys) = x : "a" : go ys
@@ -77,7 +77,7 @@ replaceThe'' = intercalate " " . go . map notThe . words
 countTheBeforeVowel :: String -> Integer
 countTheBeforeVowel = go . map notThe . words
     where go [] = 0
-          go (_: []) = 0
+          go [_] = 0
           go (Nothing : Just x: ys)
             | head x `elem` "aeiouy" = 1 + go ys
             | otherwise = 0 + go ys
@@ -97,7 +97,7 @@ mkVowel _ = Nothing
 countVowels :: String -> Integer
 countVowels = go . map mkVowel
     where go [] = 0
-          go (Just x : []) = 1
+          go [Just x] = 1
           go (Just x : xs) = 1 + go xs
           go (_:xs) = go xs
 
@@ -108,11 +108,11 @@ newtype Word' = Word' String deriving (Eq, Show)
 mkWord :: String -> Maybe Word'
 mkWord s = valid . go . map mkVowel $ s
     where go [] = 0
-          go (Just x : []) = 1
-          go (Just x : xs) = (go xs) + 1
-          go (_ : xs) = (go xs) - 1
+          go [Just x] = 1
+          go (Just x : xs) = go xs + 1
+          go (_ : xs) = go xs - 1
           valid a
-            | a > 0 || s == [] = Nothing
+            | a > 0 || null s = Nothing
             | otherwise = Just (Word' s)
 
 data Nat = Zero | Succ Nat deriving (Eq, Show)
