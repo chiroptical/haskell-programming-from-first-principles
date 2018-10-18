@@ -3,21 +3,21 @@ module Cipher where
 import Data.Char (ord)
 
 cipher :: Int -> String -> String
-cipher shift [] = []
+cipher _ [] = []
 cipher shift (' ':xs) = " " ++ cipher shift xs
 cipher shift (x:xs)
     | shift == 0 = [x]
     | x == ' ' = " " ++ cipher shift xs
-    | otherwise = [last . take shift $ chars] ++ cipher shift xs
+    | otherwise = (last . take shift $ chars) : cipher shift xs
         where chars = [x..'z'] ++ cycle ['a'..'z']
 
 uncipher :: Int -> String -> String
-uncipher shift [] = []
+uncipher _ [] = []
 uncipher shift (' ':xs) = " " ++ uncipher shift xs
 uncipher shift (x:xs)
     | shift == 0 = [x]
     | x == ' ' = " " ++ uncipher shift xs
-    | otherwise = [last . take shift $ start ++ finish] ++ uncipher shift xs
+    | otherwise = (last . take shift $ start ++ finish) : uncipher shift xs
         where start  = reverse ['a'..x]
               finish = cycle . reverse  $ ['a'..'z']
 
@@ -27,13 +27,16 @@ vigenere _ _ [] = []
 vigenere f a b = go a b 0
     where shiftSize xs n
             | d >= 0 = d
-            | otherwise = (abs d) + 1
+            | otherwise = abs d + 1
                 where d = ord (head xs) - ord (xs !! n)
           go xs ys n
-            | xs == [] = []
+            | null xs = []
             | head xs == ' ' = " " ++ go (tail xs) ys n
             | n == length ys - 1 = f (shiftSize ys n) [head xs] ++ go (tail xs) ys 0
             | otherwise = f (shiftSize ys n) [head xs] ++ go (tail xs) ys (n + 1)
 
+vigenereEncode :: String -> String -> String
 vigenereEncode = vigenere cipher
+
+vigenereDecode :: String -> String -> String
 vigenereDecode = vigenere uncipher
