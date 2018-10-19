@@ -1,1 +1,1 @@
-On Chapter 14, page 535
+On Section 14.4, Enter QuickCheck, Stack project made
