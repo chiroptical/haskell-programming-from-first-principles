@@ -27,7 +27,7 @@ import Test.QuickCheck
 -- If associative, identity, and inverse: Group
 
 -- commutative 
--- x <> y == y <> x
+-- x <> x' == x' <> x
 
 -- If associative, identity, inverse, and commutative: Abelian
 
@@ -55,10 +55,12 @@ semigroupAssoc :: (Eq m, Semigroup m) => m -> m -> m -> Bool
 semigroupAssoc a b c = (a <> b) <> c == a <> (b <> c)
 
 leftIdent :: (Eq m, Monoid m) => m -> Bool
-leftIdent a = mappend mempty a == a
+-- leftIdent a = mappend mempty a == a
+leftIdent a = mempty <> a == a
 
 rightIdent :: (Eq m, Monoid m) => m -> Bool
-rightIdent a = mappend a mempty == a
+-- rightIdent a = mappend a mempty == a
+rightIdent a = a <> mempty == a
 
 class (Monoid m) => Group m where
   inverse :: m -> m
@@ -83,13 +85,23 @@ commutativeProperty x x' = x <> x' == x' <> x
 
 newtype First' a = First' {getFirst' :: Maybe' a} deriving (Eq, Show)
 
+newtype Last' a = Last' {getLast' :: Maybe' a} deriving (Eq, Show)
+
 instance Semigroup (First' a) where
   (<>) f@(First' (Just' _)) _ = f
   (<>) _ f@(First' (Just' _)) = f
   (<>) _ _ = First' Nothing'
 
+instance Semigroup (Last' a) where
+  (<>) _ f@(Last' (Just' _)) = f
+  (<>) f@(Last' (Just' _)) _ = f
+  (<>) _ _ = Last' Nothing'
+
 instance Monoid (First' a) where
   mempty = First' Nothing'
+
+instance Monoid (Last' a) where
+  mempty = Last' Nothing'
 
 instance Arbitrary a => Arbitrary (Maybe' a) where
   arbitrary = do
@@ -100,8 +112,17 @@ instance Arbitrary a => Arbitrary (Maybe' a) where
 instance Arbitrary a => Arbitrary (First' a) where
   arbitrary = First' <$> arbitrary
 
+data NonEmpty a = a :| [a] deriving Show
+
+nonEmptyHead :: NonEmpty a -> a
+nonEmptyHead (x :| _) = x
+
+instance Semigroup (NonEmpty a) where
+  (<>) (x :| xs) (y :| ys) = x :| (xs ++ [y] ++ ys)
+
 main :: IO ()
 main = do
+  putStrLn "hello"
   -- putStrLn "semigroupAssoc :: String -> String -> String -> Bool"
   -- quickCheck (semigroupAssoc :: String -> String -> String -> Bool)
   -- putStrLn "identities :: String -> Bool"
@@ -115,6 +136,6 @@ main = do
   -- quickCheck (commutativeProperty :: String -> String -> Bool)
   -- putStrLn "commute :: Sum Int -> Sum Int -> Bool"
   -- quickCheck (commutativeProperty :: Sum Int -> Sum Int -> Bool)
-  quickCheck (semigroupAssoc :: First' String -> First' String -> First' String -> Bool)
-  quickCheck (leftIdent :: First' String -> Bool)
-  quickCheck (rightIdent :: First' String -> Bool)
+  -- quickCheck (semigroupAssoc :: First' String -> First' String -> First' String -> Bool)
+  -- quickCheck (leftIdent :: First' String -> Bool)
+  -- quickCheck (rightIdent :: First' String -> Bool)
