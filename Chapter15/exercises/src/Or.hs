@@ -1,7 +1,7 @@
 -- Chapter 15, Exercise 8
 module Or where
 
-import Test.QuickCheck (Arbitrary, arbitrary, oneof)
+import Test.QuickCheck (Arbitrary, arbitrary, oneof, frequency)
 
 data Or a b = Fst a | Snd b deriving (Eq, Show)
 
@@ -17,3 +17,5 @@ instance Semigroup (Or a b) where
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Or a b) where
   arbitrary = oneof [ Fst <$> arbitrary
                     , Snd <$> arbitrary ]
+  -- arbitrary = frequency [ (1, Fst <$> arbitrary)
+  --                       , (1, Snd <$> arbitrary) ]

@@ -1,16 +1,16 @@
 module Main where
 
-import Data.Semigroup (Sum)
 import Test.QuickCheck (quickCheck)
+import MyTypes
 import Trivial
 import Identity
 import Two
 import Three
 import BoolWrap
 import Or
-
-type SI = Sum Int
-type SD = Sum Double
+import Combine
+import Comp
+import Validation
 
 semigroupAssoc :: (Eq m, Semigroup m) => m -> m -> m -> Bool
 semigroupAssoc a b c = (a <> b) <> c == a <> (b <> c)
@@ -24,3 +24,6 @@ main = do
   quickCheck (semigroupAssoc :: BoolConj -> BoolConj -> BoolConj -> Bool)
   quickCheck (semigroupAssoc :: BoolDisj -> BoolDisj -> BoolDisj -> Bool)
   quickCheck (semigroupAssoc :: Or SI SD -> Or SI SD -> Or SI SD -> Bool)
+  quickCheck isCombineAssoc
+  quickCheck isCompAssoc
+  quickCheck (semigroupAssoc :: Validation SI SD -> Validation SI SD -> Validation SI SD -> Bool)

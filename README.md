@@ -1,1 +1,1 @@
-On Chapter 15, Exercise 9, Combine
+On Chapter 15, Exercises, Monoid Exercises
