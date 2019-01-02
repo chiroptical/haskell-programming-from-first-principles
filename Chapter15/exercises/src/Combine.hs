@@ -24,3 +24,12 @@ instance (CoArbitrary a, Arbitrary b) => Arbitrary (Combine a b) where
 
 isCombineAssoc :: Combine Int SI -> Combine Int SI -> Combine Int SI -> Int -> Bool
 isCombineAssoc ca cb cc x = unCombine ((ca <> cb) <> cc) x == unCombine (ca <> (cb <> cc)) x
+
+instance Monoid b => Monoid (Combine a b) where
+  mempty = Combine $ const mempty
+
+combineLeftIdentLaw :: Combine Int SI -> Int -> Bool
+combineLeftIdentLaw ca x = unCombine (mempty <> ca) x == unCombine ca x
+
+combineRightIdentLaw :: Combine Int SI -> Int -> Bool
+combineRightIdentLaw ca x = unCombine (ca <> mempty) x == unCombine ca x

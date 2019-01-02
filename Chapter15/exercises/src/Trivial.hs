@@ -10,3 +10,6 @@ instance Semigroup Trivial where
 
 instance Arbitrary Trivial where
   arbitrary = return Trivial
+
+instance Monoid Trivial where
+  mempty = Trivial

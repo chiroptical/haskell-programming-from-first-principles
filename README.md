@@ -1,1 +1,1 @@
-On Chapter 15, Monoid Exercises pg 616
+Finished Chapter 15

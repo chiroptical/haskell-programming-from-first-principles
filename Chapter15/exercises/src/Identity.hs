@@ -10,3 +10,6 @@ instance Semigroup a => Semigroup (Identity a) where
 
 instance Arbitrary a => Arbitrary (Identity a) where
     arbitrary = Identity <$> arbitrary
+
+instance Monoid a => Monoid (Identity a) where
+    mempty = Identity mempty

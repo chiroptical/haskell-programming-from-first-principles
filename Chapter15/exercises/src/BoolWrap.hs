@@ -27,3 +27,9 @@ instance Arbitrary BoolConj where
 
 instance Arbitrary BoolDisj where
   arbitrary = BoolDisj <$> arbitrary
+
+instance Monoid BoolConj where
+  mempty = BoolConj True
+
+instance Monoid BoolDisj where
+  mempty = BoolDisj False

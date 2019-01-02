@@ -19,3 +19,11 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (Or a b) where
                     , Snd <$> arbitrary ]
   -- arbitrary = frequency [ (1, Fst <$> arbitrary)
   --                       , (1, Snd <$> arbitrary) ]
+
+-- Fails Right Identity Law
+-- instance (Monoid a) => Monoid (Or a b) where
+--   mempty = Fst mempty
+
+-- Fails Right and Left Identity Law
+-- instance (Monoid b) => Monoid (Or a b) where
+--   mempty = Snd mempty

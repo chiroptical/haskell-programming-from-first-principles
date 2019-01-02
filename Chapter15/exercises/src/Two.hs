@@ -12,3 +12,6 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (Two a b) where
   arbitrary = do
     x <- arbitrary
     Two x <$> arbitrary
+
+instance (Monoid a, Monoid b) => Monoid (Two a b) where
+  mempty = Two mempty mempty

@@ -24,3 +24,12 @@ instance (CoArbitrary a, Arbitrary a) => Arbitrary (Comp a) where
 
 isCompAssoc :: Comp SI -> Comp SI -> Comp SI -> SI -> Bool
 isCompAssoc ca cb cc x = unComp ((ca <> cb) <> cc) x == unComp (ca <> (cb <> cc)) x
+
+instance Monoid a => Monoid (Comp a) where
+  mempty = Comp $ const mempty
+
+compLeftIdentLaw :: Comp SI -> SI -> Bool
+compLeftIdentLaw ca x = unComp (mempty <> ca) x == unComp ca x
+
+compRightIdentLaw :: Comp SI -> SI -> Bool
+compRightIdentLaw ca x = unComp (ca <> mempty) x == unComp ca x
