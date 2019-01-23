@@ -1,1 +1,1 @@
-Chapter 16, Chapter Exercises, Page 676: Problem 11
+Chapter 17, page 722, using `checkers` to test Applicative instances
