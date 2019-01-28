@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Main where
 
 import Data.List (elemIndex)
-
+import Control.Applicative
 import Data.Monoid
 import Test.QuickCheck
 import Test.QuickCheck.Checkers
@@ -122,6 +124,122 @@ instance Monoid Bull where
 instance EqProp Bull where
   (=-=) = eq
 
+instance Monoid a => Semigroup (ZipList a) where
+  (<>) = liftA2 mappend
+
+instance Monoid a => Monoid (ZipList a) where
+  -- mempty = ZipList []
+  mempty = pure mempty
+
+-- instance Arbitrary a => Arbitrary (ZipList a) where
+--   arbitrary = ZipList <$> arbitrary
+
+-- instance Arbitrary a => Arbitrary (Sum a) where
+--   arbitrary = Sum <$> arbitrary
+
+instance Eq a => EqProp (ZipList a) where
+  (=-=) = eq
+
+data List a = Nil | Cons a (List a) deriving (Eq, Show)
+
+instance Semigroup (List a) where
+  Nil <> ys = ys
+  Cons x xs <> ys = Cons x $ xs <> ys
+
+instance Functor List where
+  fmap _ Nil = Nil
+  fmap f (Cons x xs) = Cons (f x) $ fmap f xs
+
+fold :: (a -> b -> b) -> b -> List a -> b
+fold _ acc Nil = acc
+fold f acc (Cons x xs) = f x $ fold f acc xs 
+
+concat' :: List (List a) -> List a
+concat' = fold (<>) Nil
+
+flatMap :: (a -> List b) -> List a -> List b
+flatMap f as = concat' $ f <$> as
+
+-- fmap :: (a -> b) -> List a -> List b
+-- (<*>) :: List (a -> b) -> List a -> List b
+instance Applicative List where
+  pure x = Cons x Nil
+  _ <*> Nil = Nil
+  Nil <*> _ = Nil
+  -- Cons f fs <*> xs = fmap f xs <> (fs <*> xs)
+  fs <*> xs = concat' $ flatMap (\f -> Cons (f <$> xs) Nil) fs
+
+instance Eq a => EqProp (List a) where
+  xs =-= ys = xs' `eq` ys'
+    where xs' = let l = xs in take' 15 l
+          ys' = let l = ys in take' 15 l
+
+vectorOfList :: (Arbitrary a) => Int -> Gen (List a)
+vectorOfList n = if n <= 0
+                 then return Nil
+                 else Cons <$> arbitrary <*> vectorOfList (n - 1)
+
+instance Arbitrary a => Arbitrary (List a) where
+  arbitrary = sized vectorOfList
+
+take' :: Int -> List a -> List a
+take' n Nil = Nil
+take' n (Cons x xs) = if n <= 0
+                      then Nil
+                      else Cons x (take' (n - 1) xs)
+
+repeat' :: a -> List a
+repeat' x = Cons x (repeat' x)
+
+newtype ZipList' a = ZipList' (List a) deriving (Eq, Show)
+
+instance Eq a => EqProp (ZipList' a) where
+  xs =-= ys = xs' `eq` ys'
+    where xs' = let (ZipList' l) = xs in take' 15 l
+          ys' = let (ZipList' l) = ys in take' 15 l
+
+instance Semigroup (ZipList' a) where
+  ZipList' Nil <> ys = ys
+  ZipList' xs <> ZipList' ys = ZipList' $ xs <> ys
+
+instance Functor ZipList' where
+  fmap f (ZipList' xs) = ZipList' $ f <$> xs
+
+instance Applicative ZipList' where
+  pure x = ZipList' $ repeat' x
+  ZipList' Nil <*> _ = ZipList' Nil
+  _ <*> ZipList' Nil = ZipList' Nil
+  ZipList' (Cons f fs)  <*> ZipList' (Cons x xs) = ZipList' (Cons (f x) Nil) <> (ZipList' fs <*> ZipList' xs)
+
+instance Arbitrary a => Arbitrary (ZipList' a) where
+  arbitrary = ZipList' <$> arbitrary
+
+type IIS = (Int, Integer, String)
+
+data Validation e a = Fail e | Succ a deriving (Eq, Show)
+
+instance Functor (Validation e) where
+  fmap _ (Fail x) = Fail x
+  fmap f (Succ y) = Succ $ f y
+
+instance Monoid e => Applicative (Validation e) where
+  pure = Succ
+  Fail f <*> Fail x = Fail (f <> x)
+  Fail f <*> _ = Fail f
+  _ <*> Fail x = Fail x
+  Succ f <*> Succ y = Succ (f y)
+
+instance (Arbitrary e, Arbitrary a) => Arbitrary (Validation e a) where
+  arbitrary = oneof [Fail <$> arbitrary, Succ <$> arbitrary]
+
+instance (Eq e, Eq a) => EqProp (Validation e a) where
+  (=-=) = eq
+
 main :: IO ()
 main = do
-  quickBatch (monoid Twoo)
+  quickBatch $ semigroup (Nil :: List Int)
+  quickBatch $ functor (Nil :: List IIS)
+  quickBatch $ applicative (Nil :: List IIS)
+  quickBatch $ semigroup (ZipList' Nil :: ZipList' (List Int))
+  quickBatch $ applicative (ZipList' Nil :: ZipList' IIS)
+  quickBatch $ applicative (undefined :: Validation String IIS)
