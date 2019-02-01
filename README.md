@@ -1,1 +1,1 @@
-Chapter 17, page 722, using `checkers` to test Applicative instances
+Chapter 18, just finished `Either Monad` Exercise on pg. 768
