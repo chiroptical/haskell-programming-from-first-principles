@@ -1,6 +1,6 @@
 module Main where
 
-import Control.Monad (join)
+import Control.Monad (join, (>=>))
 import Test.QuickCheck
 import Test.QuickCheck.Checkers
 import Test.QuickCheck.Classes
@@ -114,8 +114,8 @@ instance Applicative (Sum a) where
 
 instance Monad (Sum a) where
   return = pure
-  First x >>= _ = First x
   Second y >>= f = f y
+  First x >>= _ = First x
 
 instance (Arbitrary a, Arbitrary b) => Arbitrary (Sum a b) where
   arbitrary = oneof [ First <$> arbitrary
@@ -127,8 +127,69 @@ instance (Eq a, Eq b) => EqProp (Sum a b) where
 forSumType :: Sum Int (Int, String, Integer)
 forSumType = undefined
 
+-- right identity
+-- m >>= return = m
+
+-- left identity
+-- return x >>= f = f x
+
+-- associativity
+-- (m >>= f) >>= g = m >>= (\x -> f x >>= g)
+
+data CountMe a = CountMe Integer a deriving (Eq, Show)
+
+instance Functor CountMe where
+  fmap f (CountMe n x) = CountMe n (f x)
+
+instance Applicative CountMe where
+  pure = CountMe 0
+  CountMe n f <*> CountMe n' x = CountMe (n + n') (f x)
+
+instance Monad CountMe where
+  return = pure
+  CountMe n x >>= f =
+    let CountMe n' x' = f x
+    in CountMe (n + n') x'
+
+instance Arbitrary a => Arbitrary (CountMe a) where
+  arbitrary = do
+    n <- arbitrary
+    CountMe n <$> arbitrary
+
+instance Eq a => EqProp (CountMe a) where
+  (=-=) = eq
+
+forCountMeType :: CountMe (Int, String, Integer)
+forCountMeType = undefined
+
+-- Kleisli Composition
+monadComposition :: Monad m => (b -> m c) -> (a -> m b) -> a -> m c
+monadComposition f g a = g a >>= f
+
+-- flip (.) :: (a -> b) -> (b -> c) -> a -> c
+-- (>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+
+sayHi :: String -> IO String
+sayHi greeting = do
+  putStrLn greeting
+  getLine
+
+readM :: Read a => String -> IO a
+readM = return . read
+
+getAge :: String -> IO Int
+getAge = sayHi >=> readM 
+
+-- f >=> g :: (a -> m c)
+
+askForAge :: IO Int
+askForAge = getAge "Hello, how old are you?"
+
 main :: IO ()
 main = do
-  quickBatch $ functor forSumType
-  quickBatch $ applicative forSumType
-  quickBatch $ monad forSumType
+  -- quickBatch $ functor forSumType
+  -- quickBatch $ applicative forSumType
+  -- quickBatch $ monad forSumType
+  quickBatch $ functor forCountMeType
+  quickBatch $ applicative forCountMeType
+  quickBatch $ monad forCountMeType
