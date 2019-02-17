@@ -42,8 +42,9 @@ a' = flip (<*>)
 
 meh :: Monad m => [a] -> (a -> m b) -> m [b]
 meh [] _ = return []
-meh (x:xs) f = let mehxsf = meh xs f
-               in f x >>= \b -> mehxsf >>= \bs -> return $ b : bs
+meh (x:xs) f = f x >>=
+  \b -> meh xs f >>=
+    \bs -> return $ b : bs
 
 meh' :: Monad m => [a] -> (a -> m b) -> m [b]
 meh' (x:xs) f = do
