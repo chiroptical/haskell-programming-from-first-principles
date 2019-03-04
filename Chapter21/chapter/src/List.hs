@@ -24,6 +24,8 @@ instance Applicative List where
 instance Foldable List where
     foldr _ acc Nil = acc 
     foldr f acc (Cons x xs) = f x $ foldr f acc xs
+    foldMap _ Nil = mempty
+    foldMap f (Cons x xs) = f x <> foldMap f xs
 
 instance Traversable List where
     traverse _ Nil = pure Nil
@@ -45,7 +47,7 @@ take' n (Cons x xs) = if n <= 0
 vectorOfList :: Arbitrary a => Int -> Gen (List a)
 vectorOfList n = if n <= 0
                  then return Nil
-                 else Cons <$> Test.QuickCheck.arbitrary <*> vectorOfList (n - 1)
+                 else Cons <$> arbitrary <*> vectorOfList (n - 1)
 
 instance Arbitrary a => Arbitrary (List a) where
     arbitrary = sized vectorOfList

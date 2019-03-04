@@ -11,7 +11,8 @@ instance Functor Identity where
 
 instance Applicative Identity where
     pure = Identity
-    Identity f <*> Identity x = Identity $ f x
+    -- Identity f <*> Identity x = Identity $ f x
+    Identity f <*> xs = fmap f xs
 
 instance Foldable Identity where
     foldMap f (Identity x) = f x

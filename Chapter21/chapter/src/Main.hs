@@ -9,6 +9,11 @@ import Two
 import Identity
 import Constant
 import List
+import Optional
+import Three
+import Big
+import SkiFree
+import Tree
 import Data.Monoid
 
 -- [IO a] -> IO [a]
@@ -52,28 +57,49 @@ pipelineFn'' = ((traverse makeIoOnlyObj . traverse decodeFn) =<<) . fetchFn
 -- traverse makeIoOnlyObj :: Either Err [SomeObj] -> b
 -- traverse decodeFn :: [String] -> Either Err [SomeObj]
 
-t :: RedGreen Int (Int, String, Sum Int)
-t = undefined
+redgreen :: RedGreen Int (Int, String, Sum Int)
+redgreen = undefined
 
-t' :: Two Int (Int, String, Sum Int)
-t' = undefined
+two :: Two Int (Int, String, Sum Int)
+two = undefined
 
-t'' :: Identity (Int, String, Sum Int)
-t'' = undefined
+identity :: Identity (Int, String, Sum Int)
+identity = undefined
 
-t''' :: Constant (Sum Int) (Int, String, Sum Int)
-t''' = undefined
+constant :: Constant (Sum Int) (Int, String, Sum Int)
+constant = undefined
 
-t'''' :: List (Int, String, Sum Int)
-t'''' = undefined
+list :: List (Int, String, Sum Int)
+list = undefined
+
+optional :: Optional (Int, String, Sum Int)
+optional = undefined
+
+three :: Three (Sum Int) (Sum Int) (Int, String, Sum Int)
+three = undefined
+
+big :: Big (Sum Int) (Int, String, Sum Int)
+big = undefined
+
+skifree :: S [] (Int, String, Sum Int)
+skifree = undefined
+
+tree :: Tree (Int, Int, Sum Int)
+tree = undefined
 
 instance Eq a => EqProp (Sum a) where
   (=-=) = eq
 
-main :: IO ()
+-- main :: IO ()
 main = do
-  quickBatch $ traversable t
-  quickBatch $ traversable t'
-  quickBatch $ traversable t''
-  quickBatch $ traversable t'''
-  quickBatch $ traversable t''''
+  -- quickBatch $ traversable redgreen
+  -- quickBatch $ traversable two
+  -- quickBatch $ traversable identity
+  -- quickBatch $ traversable constant
+  -- quickBatch $ traversable list
+  -- quickBatch $ traversable optional
+  -- quickBatch $ traversable three
+  -- quickBatch $ traversable big
+  -- quickBatch $ traversable skifree
+  quickBatch $ functor tree
+  quickBatch $ traversable tree
