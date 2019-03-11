@@ -20,3 +20,4 @@ executable chapter
   build-depends:       base >= 4.7 && < 5
                      , random
                      , transformers
+                     , dlist
