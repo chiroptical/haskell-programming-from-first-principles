@@ -4,56 +4,55 @@ module SemVer where
 
 import Control.Applicative
 import Text.Trifecta
-import Data.Maybe
+import Data.Maybe (fromMaybe)
+import Data.Ord (comparing)
 
 data NumberOrString =
       NOSS String
     | NOSI Integer
-    deriving (Eq, Show)
+    deriving (Eq, Show, Ord)
 
 type Major = Integer
 type Minor = Integer
 type Patch = Integer
-type PreRelease = [NumberOrString]
+type Prerelease = [NumberOrString]
 type Metadata = [NumberOrString]
 
-data SemVer =
-    SemVer Major Minor Patch PreRelease Metadata
-    deriving Show
+instance Ord SemVer where
+  compare x x' =
+    comparing major x x' <>
+    comparing minor x x' <>
+    comparing patch x x' <>
+    comparing prerelease x x'
 
--- Monadic Context
--- parseSemVer :: Parser SemVer
--- parseSemVer = do
---     major <- parseNoLeadingZero <* char '.'
---     minor <- parseNoLeadingZero <* char '.'
---     patch <- parseNoLeadingZero
---     prerelease <- optional (char '-' *> (parseNumberOrString `sepBy` (symbol ".")))
---     metadata <- optional (char '+' *> (parseNumberOrString `sepBy` (symbol ".")))
---     return $ SemVer major minor patch (fromMaybe [] prerelease) (fromMaybe [] metadata)
+  -- @Lumie1337
+  -- Monoid is recursive for ((->) a b)
+  -- compare =
+  --   comparing major <>
+  --   comparing minor <>
+  --   comparing patch <>
+  --   comparing prerelease
+
+data SemVer =
+    SemVer
+    { major :: Major
+    , minor :: Minor
+    , patch :: Patch
+    , prerelease :: Prerelease
+    , metadata :: Metadata
+    }
+    deriving (Eq, Show)
 
 parseSemVer :: Parser SemVer
-parseSemVer =
-    SemVer <$>
-    major <* char '.' <*>
-    minor <* char '.' <*>
-    patch <*> 
-    prerelease <*>
-    metadata
-    where major = semVerElement
-          minor = semVerElement
-          patch = semVerElement
-
-          prerelease =
-            fromMaybe [] <$>
-            optional (
-                char '-' *> 
-                (semVerPreRelease `sepBy` (symbol "."))
-            )
-          metadata = fromMaybe [] <$> optional (char '+' *> (semVerMetadata `sepBy` (symbol ".")))
-          semVerElement = do
-            s <- some (oneOf "0123456789")
-            case s of
-                ('0':_:_) -> fail "Found leading zero!"
-                _ -> return $ read s
-          semVerPreRelease = (NOSI <$> integer) <|> (NOSS <$> some alphaNum)
-          semVerMetadata = (NOSI <$> integer) <|> (NOSS <$> some alphaNum)
+parseSemVer = SemVer <$>
+              versionElement <* char '.' <*>
+              versionElement <* char '.' <*>
+              versionElement <*> 
+              prerelease <*>
+              metadata
+  where 
+    optionally p = fromMaybe [] <$> optional p
+    prerelease = optionally $ char '-' *> (numberOrString `sepBy` (symbol "."))
+    metadata = optionally $ char '+' *> (numberOrString `sepBy` (symbol "."))
+    versionElement = fmap read $ ((:) <$> oneOf "123456789" <*> many (oneOf "0123456789") <|> some (char '0'))
+    numberOrString = (NOSI <$> integer) <|> (NOSS <$> some alphaNum)

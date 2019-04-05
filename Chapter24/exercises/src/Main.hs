@@ -22,4 +22,6 @@ semver' = p parseSemVer semverEx'
 main :: IO ()
 main = do
   print semver
-  -- print $ (<) <$> semver <*> semver'
+  print semver'
+  print $ (<) <$> semver <*> semver'
+  -- print $ (NOSI 1) > (NOSS "hello")
