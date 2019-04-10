@@ -1,11 +1,15 @@
+{-# LANGUAGE QuasiQuotes #-}
 module Main where
 
 import Control.Applicative
 import Text.Trifecta
+import Text.Parser.LookAhead (lookAhead)
 import Data.Maybe
+import Text.RawString.QQ
 
 import SemVer
 import PhoneNumber
+import Activities
 
 semverEx :: String
 semverEx = "1.0.0-gamma+002"
@@ -48,6 +52,40 @@ valid''''' = "(123) 456-7890"
 invalid = "(332-222-4444"
 invalid' = "+1-123-456 7890"
 
+-- wheee a comment
+
+logFile :: String
+logFile = [r|
+# 2025-02-05
+08:00 Breakfast
+09:00 Sanitizing moisture collector
+11:00 Exercising in high-grav gym
+12:00 Lunch
+13:00 Programming
+17:00 Commuting home in rover -- hello world
+17:30 R&R
+19:00 Dinner
+21:00 Shower
+21:15 Read
+22:00 Sleep
+|]
+-- # 2025-02-07 -- dates not nececessarily sequential
+-- 08:00 Breakfast -- should I try skippin bfast?
+-- 09:00 Bumped head, passed out
+-- 13:36 Wake up, headache
+-- 13:37 Go to medbay
+-- 13:40 Patch self up
+-- 13:45 Commute home for rest
+-- 14:15 Read
+-- 21:00 Dinner
+-- 21:15 Read
+-- 22:00 Sleep
+
+example = "Commuting home in rover -- hello world"
+
+-- parseExample :: Parser String
+-- parseExample = lookAhead (optional (char ' ') *> char '-' *> char '-')
+
 main :: IO ()
 main = do
   -- print semver
@@ -60,12 +98,13 @@ main = do
   -- print $ parseString base10Integer' mempty "123abc"
   -- print $ parseString base10Integer' mempty "abc"
   -- print $ parseString base10Integer' mempty "-123abc"
-  print $ parseString parsePhoneNumber'' mempty valid
-  print $ parseString parsePhoneNumber'' mempty valid'
-  print $ parseString parsePhoneNumber'' mempty valid''
-  print $ parseString parsePhoneNumber'' mempty valid'''
-  print $ parseString parsePhoneNumber'' mempty valid''''
-  print $ parseString parsePhoneNumber'' mempty valid'''''
-  print $ parseString parsePhoneNumber'' mempty invalid
-  print $ parseString parsePhoneNumber'' mempty invalid'
-
+  -- print $ parseString parsePhoneNumber'' mempty valid
+  -- print $ parseString parsePhoneNumber'' mempty valid'
+  -- print $ parseString parsePhoneNumber'' mempty valid''
+  -- print $ parseString parsePhoneNumber'' mempty valid'''
+  -- print $ parseString parsePhoneNumber'' mempty valid''''
+  -- print $ parseString parsePhoneNumber'' mempty valid'''''
+  -- print $ parseString parsePhoneNumber'' mempty invalid
+  -- print $ parseString parsePhoneNumber'' mempty invalid'
+  print $ parseString parseDayOfActivities mempty logFile
+  -- print $ parseString parseExample mempty example
