@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module SemVer where
 
 import Control.Applicative
