@@ -62,16 +62,14 @@ data DayOfActivities =
 
 parseDayOfActivities :: Parser DayOfActivities
 parseDayOfActivities = DayOfActivities <$>
-                       (newline *> char '#' *> optional (char ' ') *> 
+                       (optional newline *> char '#' *> optional (char ' ') *> 
                         date <*
-                        optional spaces  <*
-                        optional comment <*
-                        optional (many (noneOf "\n")) <*
+                        many (noneOf "\n") <*
                         newline
                        ) <*>
                        many daysOfActivities
     where
-        comment = char '-' *> char '-'
+        comment = optional (char ' ') *> string "--"
         date = Date <$> year <*> (char '-' *> month) <*> (char '-' *> day)
         year = read <$> count 4 alphaNum
         month = do
@@ -87,8 +85,8 @@ parseDayOfActivities = DayOfActivities <$>
                            (char ' ' *> description)
         hour = read <$> count 2 alphaNum
         minute = read <$> count 2 alphaNum
-        -- We need to be able to deal with " -- ..."
-        -- -> We probably need `lookAhead`, but we don't know how to use it
-        description = many (noneOf "\n") <* newline
-        -- description' =     try (many (noneOf "\n-") <* optional (char ' ') <* comment <* optional (many (noneOf "\n")) <* newline)
-        --                <|> (many (noneOf "\n") <* newline)
+        description = (   (try (manyTill (noneOf "\n") (try comment)) <* many (noneOf "\n"))
+                      <|> many (noneOf "\n")) <* newline
+
+parseLogFile :: Parser [DayOfActivities]
+parseLogFile = many parseDayOfActivities

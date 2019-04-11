@@ -68,23 +68,19 @@ logFile = [r|
 21:00 Shower
 21:15 Read
 22:00 Sleep
+
+# 2025-02-07 -- dates not nececessarily sequential
+08:00 Breakfast -- should I try skippin bfast?
+09:00 Bumped head, passed out
+13:36 Wake up, headache
+13:37 Go to medbay
+13:40 Patch self up
+13:45 Commute home for rest
+14:15 Read
+21:00 Dinner
+21:15 Read
+22:00 Sleep
 |]
--- # 2025-02-07 -- dates not nececessarily sequential
--- 08:00 Breakfast -- should I try skippin bfast?
--- 09:00 Bumped head, passed out
--- 13:36 Wake up, headache
--- 13:37 Go to medbay
--- 13:40 Patch self up
--- 13:45 Commute home for rest
--- 14:15 Read
--- 21:00 Dinner
--- 21:15 Read
--- 22:00 Sleep
-
-example = "Commuting home in rover -- hello world"
-
--- parseExample :: Parser String
--- parseExample = lookAhead (optional (char ' ') *> char '-' *> char '-')
 
 main :: IO ()
 main = do
@@ -106,5 +102,4 @@ main = do
   -- print $ parseString parsePhoneNumber'' mempty valid'''''
   -- print $ parseString parsePhoneNumber'' mempty invalid
   -- print $ parseString parsePhoneNumber'' mempty invalid'
-  print $ parseString parseDayOfActivities mempty logFile
-  -- print $ parseString parseExample mempty example
+  print $ parseString parseLogFile mempty logFile
