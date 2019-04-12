@@ -3,13 +3,13 @@ module Main where
 
 import Control.Applicative
 import Text.Trifecta
-import Text.Parser.LookAhead (lookAhead)
 import Data.Maybe
 import Text.RawString.QQ
 
 import SemVer
 import PhoneNumber
 import Activities
+import IPAddress
 
 semverEx :: String
 semverEx = "1.0.0-gamma+002"
@@ -42,17 +42,15 @@ base10Integer' = do
     Just '-' -> negate int
     _        -> int
 
-valid = "123-456-7890"
-valid' = "1234567890"
-valid'' = "(123) 456 7890"
-valid''' = "+1-123-456-7890"
-valid'''' = "+52-123-456-7890"
-valid''''' = "(123) 456-7890"
+-- valid = "123-456-7890"
+-- valid' = "1234567890"
+-- valid'' = "(123) 456 7890"
+-- valid''' = "+1-123-456-7890"
+-- valid'''' = "+52-123-456-7890"
+-- valid''''' = "(123) 456-7890"
 
-invalid = "(332-222-4444"
-invalid' = "+1-123-456 7890"
-
--- wheee a comment
+-- invalid = "(332-222-4444"
+-- invalid' = "+1-123-456 7890"
 
 logFile :: String
 logFile = [r|
@@ -82,6 +80,14 @@ logFile = [r|
 22:00 Sleep
 |]
 
+-- IPv4 Parser
+valid = "192.168.0.1"
+valid' = "172.16.254.1"
+valid'' = "204.120.0.15"
+
+invalid = "00.00.00.00"
+invalid' = "010.010.010.010"
+
 main :: IO ()
 main = do
   -- print semver
@@ -102,4 +108,15 @@ main = do
   -- print $ parseString parsePhoneNumber'' mempty valid'''''
   -- print $ parseString parsePhoneNumber'' mempty invalid
   -- print $ parseString parsePhoneNumber'' mempty invalid'
-  print $ parseString parseLogFile mempty logFile
+  -- print $ parseString parseLogFile mempty logFile
+  -- print $ parseString parseOctets mempty valid
+  -- print $ parseString parseOctets mempty valid'
+  -- print $ parseString parseOctets mempty valid''
+  -- print $ parseString parseOctets mempty invalid
+  -- print $ parseString parseOctets mempty invalid'
+  -- print "----------------------------------------"
+  print $ parseString parseIPAddress mempty valid
+  print $ parseString parseIPAddress mempty valid'
+  print $ parseString parseIPAddress mempty valid''
+  print $ parseString parseIPAddress mempty invalid
+  print $ parseString parseIPAddress mempty invalid'
