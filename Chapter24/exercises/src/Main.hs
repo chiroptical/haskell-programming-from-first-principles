@@ -5,6 +5,7 @@ import Control.Applicative
 import Text.Trifecta
 import Data.Maybe
 import Text.RawString.QQ
+import Data.Bits
 
 import SemVer
 import PhoneNumber
@@ -109,12 +110,6 @@ main = do
   -- print $ parseString parsePhoneNumber'' mempty invalid
   -- print $ parseString parsePhoneNumber'' mempty invalid'
   -- print $ parseString parseLogFile mempty logFile
-  -- print $ parseString parseOctets mempty valid
-  -- print $ parseString parseOctets mempty valid'
-  -- print $ parseString parseOctets mempty valid''
-  -- print $ parseString parseOctets mempty invalid
-  -- print $ parseString parseOctets mempty invalid'
-  -- print "----------------------------------------"
   print $ parseString parseIPAddress mempty valid
   print $ parseString parseIPAddress mempty valid'
   print $ parseString parseIPAddress mempty valid''
