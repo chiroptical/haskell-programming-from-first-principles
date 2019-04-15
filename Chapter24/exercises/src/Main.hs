@@ -11,6 +11,7 @@ import SemVer
 import PhoneNumber
 import Activities
 import IPAddress
+import IPAddress6
 
 semverEx :: String
 semverEx = "1.0.0-gamma+002"
@@ -82,12 +83,25 @@ logFile = [r|
 |]
 
 -- IPv4 Parser
-valid = "192.168.0.1"
-valid' = "172.16.254.1"
-valid'' = "204.120.0.15"
+-- valid = "192.168.0.1"
+-- valid' = "172.16.254.1"
+-- valid'' = "204.120.0.15"
 
-invalid = "00.00.00.00"
-invalid' = "010.010.010.010"
+-- invalid = "00.00.00.00"
+-- invalid' = "010.010.010.010"
+
+-- IPv6 Parser
+a =  "FE80:0000:0000:0000:0202:B3FF:FE1E:8329"
+-- originally 2001:DB8::8:800:200C:417A
+b = "2001:0DB8:0000:0000:0008:0800:200C:417A"
+
+-- Without zeros on left
+a' =  "FE80:0:0:0:202:B3FF:FE1E:8329"
+b' = "2001:DB8:0:0:8:800:200C:417A"
+
+-- Shortened IPv6
+a'' =  "FE80::202:B3FF:FE1E:8329"
+b'' = "2001:DB8::8:800:200C:417A"
 
 main :: IO ()
 main = do
@@ -110,8 +124,20 @@ main = do
   -- print $ parseString parsePhoneNumber'' mempty invalid
   -- print $ parseString parsePhoneNumber'' mempty invalid'
   -- print $ parseString parseLogFile mempty logFile
-  print $ parseString parseIPAddress mempty valid
-  print $ parseString parseIPAddress mempty valid'
-  print $ parseString parseIPAddress mempty valid''
-  print $ parseString parseIPAddress mempty invalid
-  print $ parseString parseIPAddress mempty invalid'
+  -- print $ parseString parseIPAddress mempty valid
+  -- print $ parseString parseIPAddress mempty valid'
+  -- print $ parseString parseIPAddress mempty valid''
+  -- print $ parseString parseIPAddress mempty invalid
+  -- print $ parseString parseIPAddress mempty invalid'
+  let as  = parseString parseIPAddress6 mempty a
+  let bs  = parseString parseIPAddress6 mempty b
+  let as' = parseString parseIPAddress6 mempty a'
+  let bs' = parseString parseIPAddress6 mempty b'
+  let as'' = parseString parseIPAddress6 mempty a''
+  let bs'' = parseString parseIPAddress6 mempty b''
+  print $ as
+  print $ bs
+  print $ (==) <$> as <*> as'
+  print $ (==) <$> bs <*> bs'
+  print $ (==) <$> as <*> as''
+  print $ (==) <$> bs <*> bs''

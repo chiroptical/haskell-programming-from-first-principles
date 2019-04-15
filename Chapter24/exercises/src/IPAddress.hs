@@ -6,8 +6,7 @@ import Data.Word (Word32)
 import Data.Bits (shift)
 
 newtype IPAddress =
-    IPAddress
-    { ip :: Word32 }
+    IPAddress {ip :: Word32}
     deriving (Eq, Ord, Show)
 
 mapToSnd :: (a -> b) -> a -> (a, b)
