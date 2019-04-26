@@ -50,7 +50,7 @@ parseIPAddress6 = IPAddress6 <$> ipAddr6
         octets :: Parser [Integer]
         octets = do
             xs <- padIPv6 <$> (mapToSnd length <$> (sepBy group (char ':')))
-            ys <- return $ splitGroup <$> xs
-            zs <- return $ readHex <$> (ys >>= id)
+            let ys = splitGroup <$> xs
+            let zs = readHex <$> (ys >>= id)
             return $ foldr (\((x,_):_) acc -> x : acc) [] zs
 
