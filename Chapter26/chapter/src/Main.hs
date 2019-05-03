@@ -1,4 +1,14 @@
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TupleSections #-}
+
 module Main where
+
+import Data.Bifunctor
+import Data.Functor.Identity (Identity)
+import OuterInner
+import Control.Monad.Trans.Class
+import Control.Monad.IO.Class
+import Control.Monad
 
 newtype MaybeT m a =
   MaybeT { runMaybeT :: m (Maybe a) }
@@ -100,6 +110,37 @@ instance Monad m => Monad (StateT s m) where
   sma >>= f = StateT $ \s -> do
     (a, s') <- runStateT sma s
     runStateT (f a) s'
+
+-- type Maybe a = MaybeT Identity a
+-- type Either e a = EitherT e Identity a
+-- type Reader r a = ReaderT r Identity a
+type State s a = StateT s Identity a
+
+instance MonadTrans MaybeT where
+  lift = MaybeT . liftM Just
+
+instance MonadTrans (EitherT e) where
+  lift :: Monad m => m a -> EitherT e m a
+  lift = EitherT . liftM Right
+
+instance MonadTrans (ReaderT r) where
+  lift = ReaderT . const
+
+instance MonadTrans (StateT s) where
+  lift :: Monad m => m a -> StateT s m a
+  -- lift ma = StateT $ (\s -> ma >>= \a -> return (a, s))
+  lift m = StateT $ \s -> do
+    a <- m
+    return (a, s)
+
+instance MonadIO m => MonadIO (MaybeT m) where
+  liftIO = lift . liftIO
+
+instance MonadIO m => MonadIO (ReaderT r m) where
+  liftIO = lift . liftIO
+
+instance MonadIO m => MonadIO (StateT s m) where
+  liftIO = lift . liftIO
 
 main :: IO ()
 main = do
