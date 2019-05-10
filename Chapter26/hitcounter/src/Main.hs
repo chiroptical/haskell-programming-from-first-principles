@@ -12,31 +12,32 @@ import Data.Text.Lazy (Text)
 import qualified Data.Text.Lazy as TL
 import System.Environment (getArgs)
 import Web.Scotty.Trans
+import AppTwo
 
-data Config =
-  Config { counts :: IORef (M.Map Text Integer)
-         , prefix :: Text
-         }
+-- data Config =
+--   Config { counts :: IORef (M.Map Text Integer)
+--          , prefix :: Text
+--          }
 
-type Scotty = ScottyT Text (ReaderT Config IO)
-type Handler = ActionT Text (ReaderT Config IO)
+-- type Scotty = ScottyT Text (ReaderT Config IO)
+-- type Handler = ActionT Text (ReaderT Config IO)
 
-bumpBoop :: Text -> M.Map Text Integer -> M.Map Text Integer
-bumpBoop k m = M.insertWith (+) k 1 m
+-- bumpBoop :: Text -> M.Map Text Integer -> M.Map Text Integer
+-- bumpBoop k m = M.insertWith (+) k 1 m
 
-app :: Scotty ()
-app = get "/:key" $ do
-  unprefixed <- param "key"
-  config <- lift ask
-  let key' = mappend (prefix config) unprefixed
-      ref = counts config
-  updatedMap <- liftIO $ bumpBoop key' <$> readIORef ref
-  liftIO $ writeIORef ref updatedMap
-  html $
-    mconcat [ "<h1> Success! Count was: "
-            , TL.pack $ show $ fromMaybe 0 $ M.lookup key' updatedMap
-            , "</h1>"
-            ]
+-- app :: Scotty ()
+-- app = get "/:key" $ do
+--   unprefixed <- param "key"
+--   config <- lift ask
+--   let key' = mappend (prefix config) unprefixed
+--       ref = counts config
+--   updatedMap <- liftIO $ bumpBoop key' <$> readIORef ref
+--   liftIO $ writeIORef ref updatedMap
+--   html $
+--     mconcat [ "<h1> Success! Count was: "
+--             , TL.pack $ show $ fromMaybe 0 $ M.lookup key' updatedMap
+--             , "</h1>"
+--             ]
          
 main :: IO ()
 main = do
@@ -44,4 +45,4 @@ main = do
   counter <- newIORef M.empty
   let config = Config counter (TL.pack prefixArg)
       runR r = runReaderT r config
-  scottyT 3000 runR app
+  scottyT 3000 runR AppTwo.app
