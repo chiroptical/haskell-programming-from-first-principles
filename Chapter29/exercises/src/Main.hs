@@ -59,10 +59,8 @@ main = do
     else pure ()
   string <- hGetContents stdin
   case args of
-    [option] ->
-      case option of
-        "-d" -> hPutStr stdout $ vigenereDecode string key
-        "-e" -> hPutStr stdout $ vigenereEncode string key
-        _    -> print usage
+    ["-d"] -> hPutStr stdout $ vigenereDecode string key
+    ["-e"] -> hPutStr stdout $ vigenereEncode string key
+    _      -> print usage
   where
     key = "world"
