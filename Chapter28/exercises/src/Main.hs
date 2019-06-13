@@ -20,25 +20,25 @@ q :: Queue Integer
 q = Queue [1 .. 500] [1 .. 500]
 
 queueViaQueue :: Queue Integer -> Queue Integer
-queueViaQueue qi = go 10000 qi
+queueViaQueue qi = go 1000 qi
   where
     go 0 q = q
     go n q
-      | n `mod` 2 == 0 = push 0 q
+      | even n = go (n - 1) (push 0 q)
       | otherwise =
         let Just (_, q') = pop q
-         in q'
+         in go (n - 1) q'
 
 q' :: [Integer]
 q' = [1 .. 1000]
 
 queueViaList :: [Integer] -> [Integer]
-queueViaList qi = go 10000 qi
+queueViaList qi = go 1000 qi
   where
     go 0 q = q
     go n q
-      | n `mod` 2 == 0 = 0 : q
-      | otherwise = init q
+      | even n = go (n - 1) (0 : q)
+      | otherwise = go (n - 1) (init q)
 
 main :: IO ()
 main =
